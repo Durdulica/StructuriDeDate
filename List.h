@@ -298,7 +298,227 @@ struct nrList {
     //todo: sa se stearga toate elem. ce au cif. din mij patr. perf.
 
     bool ePatrPerf(int nr) {
-        for(int i = 2; i <= nr/2; i++){}
+        for(int i = 1; i <= nr; i++)
+            if(i * i == nr)
+                return true;
+        return false;
+    }
+
+    int ctCifNr(int nr) {
+        int ct = 0;
+        while(nr) {
+            ct++;
+            nr /= 10;
+        }
+        return ct;
+    }
+
+    int mijNr(int nr) {
+        int ct = ctCifNr(nr), p = 1;
+
+        for(int i = 0; i < ct/2; i++) p*= 10;
+
+        if(ct % 2 != 0) {
+            nr /= p;
+            return nr % 10;
+        }
+
+        nr /= (p / 10);
+        return nr % 100;
+    }
+
+    int elimMijPatrPerf() {
+        Node *current = head;
+        int counter = 0;
+
+        while(current != NULL) {
+            if(ePatrPerf(mijNr(current->number))) {
+                removePosition(counter);
+                return 1;
+            }
+            current = current->next;
+            counter++;
+        }
+        return 0;
+    }
+
+    //todo:sa se stearga dubletele alaturate cee sunt prime intre ele
+
+    bool primeIntreEle(int a, int b) {
+        for(int i  = 2; i <= a/2 && i <= b/2; i++)
+            if(a % i == 0 && b % i == 0) return false;
+        return true;
+    }
+
+    int elimPrimeIntreEle() {
+        Node *current = head;
+        int counter = 0;
+        while(current != NULL) {
+            if(primeIntreEle(current->number, current->next->number)) {
+                removePosition(counter);
+                return 1;
+            }
+            current = current->next;
+            counter++;
+        }
+        return 0;
+    }
+
+    //todo: sa se insereze dupa fiecare elem. negativ cubul lui
+
+    Node *addPosition(int nr, int index) {
+        if(index == 0) {
+            addHead(nr);
+            return head;
+        }
+
+        Node *current = head;
+        Node *node = new Node();
+        node->number = nr;
+        int counter = 0;
+
+        while(current->next != NULL) {
+            if(counter + 1 == index) {
+                node->next = current->next;
+                current->next = node;
+                return node;
+            }
+            current = current->next;
+            counter++;
+        }
+
+        return nullptr;
+    }
+
+    void addCubeNegativeNext() {
+        Node *current = head;
+        int counter = 0;
+        while(current != NULL) {
+            if(current->number < 0) {
+                addPosition(current->number * current->number * current->number, counter);
+                counter++;
+            }
+            current = current->next;
+            counter++;
+        }
+    }
+
+    //todo: sa se adauge dupa al k-lea elem ce are cif. in ordine consec. de la st la dr. rasturnatul lui
+
+    bool cifConsec(int nr) {
+        while(nr / 10 != NULL) {
+            if(nr % 10 <= nr % 100 / 10) return false;
+            nr /= 10;
+        }
+        return true;
+    }
+
+    void f(int k) {
+        Node *current = head;
+        int counter = 0,ct = 0;
+        while(current != NULL) {
+            if(cifConsec(current->number)) {
+                ct++;
+                if(k == ct) {
+                    addPosition(oglindit(current->number), counter + 1);
+                    return;
+                }
+            }
+            current = current->next;
+            counter++;
+        }
+    }
+
+    //todo:sa se insereze intre oricare 2 elem. egale val. alipirii celui de-al doilea nr. la primul
+
+    int lipireAsiB(int a, int b) {
+        int p = 1, aux = ctCifNr(b);
+        for(int i = 0; i < aux; i++) {
+            p *= 10;
+        }
+        a *= p;
+        a += b;
+        return a;
+    }
+
+    void f1() {
+        Node *current = head;
+        int counter = 0;
+        while(current->next != NULL) {
+            if(current->number == current->next->number) {
+                addPosition(current->number, counter + 1);
+                current = current->next;
+                current->number = lipireAsiB(current->number, current->next->number);
+            }
+            current = current->next;
+            counter++;
+        }
+    }
+
+    //todo:sa se insereze dupa al k-lea elem. cu 3 div. suma div. lui
+
+    int ctDiv(int nr) {
+        int counter = 0;
+        for(int i = 2; i <= nr/2; i++) {
+            if(nr % i == 0) counter++;
+        }
+        return counter;
+    }
+
+    int sumDiv(int nr) {
+        int sum = 0;
+        for(int i = 2; i <= nr/2; i++) {
+            if(nr % i == 0) sum+=i;
+        }
+        return sum;
+    }
+
+    void f2(int k, int nrDiv) {
+        Node *current = head;
+        int counter = 0,ct = 0;
+        while(current != NULL) {
+            if(ctDiv(current->number) == nrDiv) {
+                ct++;
+                if(k == ct) {
+                    addPosition(sumDiv(current->number), counter + 1);
+                    return;
+                }
+            }
+            current = current->next;
+            counter++;
+        }
+    }
+
+    //todo:inserati inainte de fiecare nr. cu toate cif. patr. perf. prod. cif. lui
+
+    int prodCif(int nr) {
+        int p = 1;
+        while(nr) {
+            p *= nr % 10;
+            nr /= 10;
+        }
+        return p;
+    }
+
+    bool cifPatrPerf(int nr) {
+        while(nr != 0) {
+            if(!ePatrPerf(nr % 10)) return false;
+            nr /= 10;
+        }
+        return true;
+    }
+
+    void f3() {
+        Node *current = head;
+        int counter = 0;
+        while(current != NULL) {
+            if(cifPatrPerf(current->number)) {
+                addPosition(prodCif(current->number), counter);
+                current = current->next;
+            }
+            current = current->next;
+            counter++;
+        }
     }
 };
 #endif //LISTA_H

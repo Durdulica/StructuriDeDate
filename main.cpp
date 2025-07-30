@@ -29,16 +29,12 @@
 int main() {
     nrList *list = new nrList;
 
-    list->addTail(15);
+    list->addTail(10);
     list->addTail(115);
-    list->addTail(28);
-    list->addTail(0);
-    list->addTail(7);
-    list->addTail(33);
+    list->addTail(14);
+    list->addTail(15);
+    list->addTail(23);
+    list->addTail(-3);
     list->addTail(6);
 
-    list->afisare();
-
-
-    list->afisare();
 }
